@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz : Démarche Marketing & Définition des Marchés</title>
+    <style>
+        body {
+            font-family: 'Mayan', sans-serif;
+            margin: 0;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            text-align: center;
+        }
+        .quiz-container, .summary {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-image: url('images/back.jpg.webp');
+            background-size: cover;
+            background-position: center;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #000;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin-left: 20%;
+        }
+        .choices li {
+            margin: 8px 0;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #FF0000;
+            color: white;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #CC0000;
+        }
+        .summary {
+            display: none;
+        }
+        .summary ul {
+            list-style: none;
+            padding: 0;
+        }
+        .summary li {
+            text-align: left;
+            margin-left: 20%;
+            margin-bottom: 10px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        .score {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .quiz-container, .summary {
+                max-width: 90%;
+                margin: 20px auto;
+                padding: 15px;
+                border-radius: 10px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .quiz-container, .summary {
+                padding: 10px;
+                margin: 10px;
+                border-radius: 10px;
+            }
+            .question {
+                font-size: 16px;
+            }
+            button {
+                font-size: 12px;
+                padding: 6px 12px;
+                border-radius: 10px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .quiz-container, .summary {
+                max-width: 800px;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="quiz-container" id="quiz-container">
+    <h2>QCM ENTRAINEMENT - The Phillips Curve and Inflation-Unemployment Trade-off</h2>
+    <div id="question-container">
+        <!-- Les questions seront affichées ici dynamiquement -->
+    </div>
+    <button id="next-button" onclick="nextQuestion()">Suivant</button>
+</div>
+
+<div class="summary" id="summary">
+    <h3>Récapitulatif</h3>
+    <ul id="summary-list">
+        <!-- Le récapitulatif des réponses sera affiché ici -->
+    </ul>
+    <div class="score" id="score"></div>
+    <button onclick="restartQuiz()">Recommencer</button>
+</div>
+
+<script>
+    const quizData = [
+        { question: "What does the Phillips Curve represent?", choices: ["The inverse relationship between inflation and unemployment", "The direct relationship between inflation and unemployment", "The relationship between inflation and interest rates", "The trade-off between economic growth and inflation"], correct: 0 },
+        { question: "How does the Phillips Curve explain the trade-off between inflation and unemployment?", choices: ["High unemployment leads to high inflation", "Low unemployment leads to higher inflation, and high unemployment leads to lower inflation", "Inflation and unemployment are independent of each other", "High inflation always leads to lower economic growth"], correct: 1 },
+        { question: "In the wage-setting equation W=Pe​F(u,z), what does z represent?", choices: ["The unemployment rate", "Expected inflation", "Factors that affect wage determination, such as unemployment benefits", "The actual price level"], correct: 2 },
+        { question: "Which of the following factors does not directly affect wage determination according to the Phillips Curve model?", choices: ["Expected inflation", "Unemployment benefits", "Exchange rate fluctuations", "Collective bargaining"], correct: 2 },
+        { question: "What is the wage-price spiral?", choices: ["A situation where higher inflation leads to lower wages", "A feedback loop where rising wages lead to higher prices, which in turn lead to higher wages", "A policy where wages are indexed to inflation", "A government policy to stabilize wages"], correct: 1 },
+        { question: "How does expected inflation affect the Phillips Curve?", choices: ["Workers ask for higher wages if they expect inflation, leading to higher prices", "Expected inflation reduces the trade-off between inflation and unemployment", "Expected inflation increases unemployment in the short run", "Expected inflation has no effect on the Phillips Curve"], correct: 0 },
+        { question: "What happens to the Phillips Curve when inflation is high and volatile, and the central bank is not credible?", choices: ["The Phillips Curve flattens", "The Phillips Curve steepens", "The economy experiences a stagflationary environment", "The Phillips Curve becomes an accelerationist Phillips Curve"], correct: 3 },
+        { question: "What is the relationship between natural unemployment and the Phillips Curve?", choices: ["The Phillips Curve shifts according to changes in the natural rate of unemployment", "The Phillips Curve is unaffected by changes in natural unemployment", "The natural rate of unemployment only affects inflation, not unemployment", "The natural rate of unemployment is unrelated to the Phillips Curve"], correct: 0 },
+        { question: "What caused the stagflation in the 1970s that contradicted the original Phillips Curve?", choices: ["An increase in money supply and a decrease in output", "A combination of high inflation and high unemployment", "A fall in inflation with increasing employment", "An increase in both inflation and output"], correct: 1 },
+        { question: "Which of the following best describes the natural rate of unemployment?", choices: ["The unemployment rate at which inflation does not accelerate", "The unemployment rate when inflation is zero", "The unemployment rate at full employment", "The rate of unemployment during economic recessions"], correct: 0 },
+        { question: "What happens when the central bank's inflation target is credible and inflation is low and stable?", choices: ["The Phillips Curve becomes more volatile", "Inflation expectations are anchored, and the Phillips Curve becomes stable", "The Phillips Curve shifts downward every year", "Unemployment automatically decreases"], correct: 1 },
+        { question: "When the expected inflation is based on past inflation, what type of Phillips Curve emerges?", choices: ["The original Phillips Curve", "The augmented Phillips Curve", "The vertical Phillips Curve", "The long-run Phillips Curve"], correct: 1 },
+        { question: "How does a change in unemployment benefits affect the Phillips Curve?", choices: ["It shifts the Phillips Curve to the right", "It has no effect on the Phillips Curve", "It flattens the Phillips Curve", "It shifts the Phillips Curve to the left"], correct: 0 },
+        { question: "Why does downward wage rigidity create a problem for the Phillips Curve during periods of deflation?", choices: ["Wages cannot decrease quickly enough, leading to unemployment", "Wages fall too fast, leading to inflation", "The Phillips Curve suggests that wages should increase during deflation", "Deflation eliminates the natural rate of unemployment"], correct: 0 },
+        { question: "How does an increase in the markup (m) affect the Phillips Curve?", choices: ["It shifts the Phillips Curve to the left", "It flattens the Phillips Curve", "It shifts the Phillips Curve to the right", "It eliminates the Phillips Curve"], correct: 2 }
+    ];
+
+    let currentQuestionIndex = 0;
+    let selectedAnswers = [];
+
+    function loadQuestion() {
+        const container = document.getElementById('question-container');
+        container.innerHTML = '';
+
+        const questionData = quizData[currentQuestionIndex];
+        const questionElem = document.createElement('div');
+        questionElem.className = 'question';
+        questionElem.textContent = questionData.question;
+
+        const choicesElem = document.createElement('ul');
+        choicesElem.className = 'choices';
+
+        questionData.choices.forEach((choice, index) => {
+            const choiceElem = document.createElement('li');
+            const choiceInput = document.createElement('input');
+            choiceInput.type = 'radio';
+            choiceInput.name = 'choice';
+            choiceInput.value = index;
+            choiceInput.id = `choice${index}`;
+            
+            const choiceLabel = document.createElement('label');
+            choiceLabel.htmlFor = `choice${index}`;
+            choiceLabel.textContent = choice;
+
+            choiceElem.appendChild(choiceInput);
+            choiceElem.appendChild(choiceLabel);
+            choicesElem.appendChild(choiceElem);
+        });
+
+        container.appendChild(questionElem);
+        container.appendChild(choicesElem);
+    }
+
+    function nextQuestion() {
+        const selectedChoice = document.querySelector('input[name="choice"]:checked');
+        if (!selectedChoice) {
+            alert("Veuillez sélectionner une réponse !");
+            return;
+        }
+
+        selectedAnswers.push(parseInt(selectedChoice.value));
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showSummary();
+        }
+    }
+
+    function showSummary() {
+        document.getElementById('quiz-container').style.display = 'none';
+        const summary = document.getElementById('summary');
+        summary.style.display = 'block';
+
+        const summaryList = document.getElementById('summary-list');
+        summaryList.innerHTML = '';
+
+        let correctAnswers = 0;
+
+        quizData.forEach((q, index) => {
+            const summaryItem = document.createElement('li');
+            summaryItem.innerHTML = `
+                <strong>${q.question}</strong><br>
+                <div style="text-align: left; margin-left: 20%;">
+                    Votre réponse: ${q.choices[selectedAnswers[index]]} - 
+                    ${selectedAnswers[index] === q.correct ? '<span class="correct">Correct</span>' : '<span class="incorrect">Incorrect</span>'}<br>
+                    Bonne réponse: ${q.choices[q.correct]}
+                </div>
+            `;
+            summaryList.appendChild(summaryItem);
+            if (selectedAnswers[index] === q.correct) {
+                correctAnswers++;
+            }
+        });
+
+        document.getElementById('score').textContent = `Score: ${correctAnswers} / ${quizData.length}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        selectedAnswers = [];
+        document.getElementById('summary').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+
+
+</html>
